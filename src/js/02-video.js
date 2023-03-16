@@ -1,17 +1,20 @@
 "use strict";
 
-{/* <iframe src="https://player.vimeo.com/video/236203659" width="640" height="360" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+import VideoPlayer from '@vimeo/player'
+import throttle from 'lodash.throttle'
 
-<script src="https://player.vimeo.com/api/player.js"></script>
-<script>
-    const iframe = document.querySelector('iframe');
-    const player = new Vimeo.Player(iframe);
+const iframe = document.querySelector('iframe');
+const player = new VideoPlayer(iframe);
 
-    player.on('play', function() {
-        console.log('played the video!');
-    });
+const STORAGE_KEY = "videoplayer-current-time";
 
-    player.getVideoTitle().then(function(title) {
-        console.log('title:', title);
-    });
-</script> */}
+player.on('timeupdate', throttle(onPlay, 1000));
+
+function onPlay (data) {
+    const formData = data.seconds;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+};
+
+const storedTime = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+player.setCurrentTime(storedTime||0);
